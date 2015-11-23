@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"encoding/base64"
 	"flag"
 	"fmt"
 	"io"
@@ -89,7 +90,8 @@ func checkArgs(args []string) error {
 
 		typ := http.DetectContentType(buf)
 		if !strings.HasPrefix(typ, "text") {
-			return fmt.Errorf("File %s isn't textual file.", arg)
+			buffers[arg] = base64.StdEncoding.EncodeToString(buf)
+			return nil
 		}
 
 		buffers[arg] = string(buf)
