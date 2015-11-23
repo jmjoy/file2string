@@ -62,7 +62,11 @@ func main() {
 	createDir(filePath)
 
 	tmpFileName := writeTmpFile(filePath, args)
-	defer os.Remove(tmpFileName)
+	defer func() {
+		if err := os.Remove(tmpFileName); err != nil {
+			panic(err)
+		}
+	}()
 
 	writeTargetFile(filePath, tmpFileName)
 }
@@ -166,11 +170,13 @@ func writeTargetFile(filePath, tmpFileName string) {
 	if err != nil {
 		panic(err)
 	}
+	defer fw.Close()
 
 	fr, err := os.Open(tmpFileName)
 	if err != nil {
 		panic(err)
 	}
+	defer fr.Close()
 
 	_, err = io.Copy(fw, fr)
 	if err != nil {
